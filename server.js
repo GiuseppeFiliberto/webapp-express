@@ -3,6 +3,9 @@ const app = express()
 const port = 3006
 const cors = require('cors')
 const moviesRoute = require('./router/moviesRoute')
+const notFound = require('./middlewares/error_404')
+const serverError = require('./middlewares/serverError')
+
 //Middleware static files
 app.use(express.static('public'))
 
@@ -23,3 +26,8 @@ app.listen(port, () => {
 
 //middleware
 app.use('/api/v1/movies', moviesRoute);
+
+//error 404
+app.use(notFound)
+//server error
+app.use(serverError)
