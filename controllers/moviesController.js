@@ -32,16 +32,28 @@ function show(req, res) {
 }
 
 function store(req, res) {
-    const { movie_id, reviewer, content } = req.body
+    const movie_id = Number(req.params.id)
+    const { name, text, vote } = req.body
 
-    if (!movie_id || !reviewer || !content) {
-        return res.status(400).json({ error: 'Missing required fields' })
-    }
+    const created_at = new Date().toISOString().slice(0, 19).replace('T', ' ')
+    const updated_at = created_at
 
-    const sql = 'INSERT INTO reviews (movie_id, reviewer, content) VALUES (?, ?, ?)'
-    connection.query(sql, [movie_id, reviewer, content], (err, result) => {
-        if (err) return res.status(500).json({ error: 'Insert Failed' })
-        res.status(201).json({ message: 'Review added', review_id: result.insertId })
+    const sql = 'INSERT INTO reviews (name, text, vote, movie_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)'
+    const sqlValues = [name, text, vote, movie_id, created_at, updated_at]
+
+    connection.query(sql, sqlValues, (err, results) => {
+        if (err) return res.status(500).json({ error: 'Query Failed' })
+
+        const newReview = {
+            id: results.insertId,
+            name,
+            text,
+            vote,
+            created_at,
+            updated_at
+        }
+
+        res.status(201).json({ message: 'Review added succesfully', newReview })
     })
 }
 
